@@ -3,6 +3,24 @@ export type AssumptionStatus = 'likely' | 'uncertain' | 'unlikely';
 export type Horizon = '3_months' | '1_year' | '3_years';
 export type PathColorTheme = 'blue' | 'teal' | 'lavender' | 'neutral';
 
+export interface UserProfile {
+  name?: string;
+  occupation: string;
+  industry: string;
+  experienceLevel: string;
+  interests: string[];
+  riskTolerance: string;
+  financialRunway: string;
+  lifeStage?: string;
+}
+
+export interface ReplayDiagnostics {
+  primaryMotivation: string;
+  worstCaseFear: string;
+  decisionWindow: string;
+  stakeholdersImpacted: string;
+}
+
 export interface MilestoneEvent {
   id: string;
   horizon: Horizon;
@@ -29,7 +47,7 @@ export interface ScenarioAssumption {
 
 export interface ScenarioPath {
   id: string;
-  optionLabel: string; // e.g. "Option A", "Option B"
+  optionLabel: string;
   optionDescription: string;
   pathTitle: string;
   overview: string;
@@ -62,6 +80,8 @@ export interface DecisionReplay {
     timeHorizon: string;
     relevantExperience?: string;
   };
+  userProfile?: UserProfile;
+  diagnostics?: ReplayDiagnostics;
   priorities: string[];
   scenarios: ScenarioPath[];
   branchesExploredCount: number;
@@ -71,7 +91,7 @@ export interface DecisionReplay {
 
 export interface ComparisonDimension {
   dimension: string;
-  assessment: Record<string, string>; // pathId -> qualitative assessment string
+  assessment: Record<string, string>;
   explanation: string;
 }
 

@@ -1,55 +1,91 @@
 import { z } from "zod";
 
-export const MilestoneEventSchema = z.object({
-  id: z.string().optional().default(""),
-  horizon: z.enum(["3_months", "1_year", "3_years"]).optional().default("1_year"),
-  horizonLabel: z.string().optional().default("Milestone Horizon"),
-  title: z.string().default("Milestone"),
-  description: z.string().default("Hypothetical development event."),
-  opportunities: z.array(z.string()).optional().default([]),
-  challenges: z.array(z.string()).optional().default([]),
-  assumptions: z.array(z.string()).optional().default([]),
-  uncertaintyLevel: z.enum(["lower", "moderate", "higher"]).optional().default("moderate"),
-  uncertaintyReason: z.string().optional().default("General uncertainty across this horizon."),
-  turningPoints: z
-    .array(
-      z.object({
-        title: z.string().default("Turning Point"),
-        description: z.string().default("Catalyst event"),
-        possibleImpact: z.string().default("High potential impact on trajectory"),
+export const MilestoneEventSchema = z.preprocess(
+  (val: any) => {
+    if (typeof val !== "object" || val === null) return val;
+    return {
+      ...val,
+      title: val.title || val.eventTitle || val.name || "Milestone Development",
+      description: val.description || val.summary || "Hypothetical event details.",
+      horizon: val.horizon || (val.timeHorizon === "3_months" ? "3_months" : val.timeHorizon === "3_years" ? "3_years" : "1_year"),
+      opportunities: val.opportunities || val.benefits || val.pros || [],
+      challenges: val.challenges || val.risks || val.obstacles || val.cons || [],
+      assumptions: val.assumptions || [],
+      turningPoints: val.turningPoints || val.turning_points || [],
+    };
+  },
+  z.object({
+    id: z.string().optional().default(""),
+    horizon: z.enum(["3_months", "1_year", "3_years"]).optional().default("1_year"),
+    horizonLabel: z.string().optional().default("Milestone Horizon"),
+    title: z.string().default("Milestone"),
+    description: z.string().default("Hypothetical development event."),
+    opportunities: z.array(z.string()).optional().default([]),
+    challenges: z.array(z.string()).optional().default([]),
+    assumptions: z.array(z.string()).optional().default([]),
+    uncertaintyLevel: z.enum(["lower", "moderate", "higher"]).optional().default("moderate"),
+    uncertaintyReason: z.string().optional().default("General uncertainty across this horizon."),
+    turningPoints: z
+      .array(
+        z.object({
+          title: z.string().default("Turning Point"),
+          description: z.string().default("Catalyst event"),
+          possibleImpact: z.string().default("High potential impact on trajectory"),
+        })
+      )
+      .optional()
+      .default([]),
+  })
+);
+
+export const ScenarioAssumptionSchema = z.preprocess(
+  (val: any) => {
+    if (typeof val === "string") {
+      return { statement: val, status: "uncertain" };
+    }
+    return val;
+  },
+  z.object({
+    id: z.string().optional().default(""),
+    statement: z.string(),
+    status: z.enum(["likely", "uncertain", "unlikely"]).optional().default("uncertain"),
+  })
+);
+
+export const ScenarioPathSchema = z.preprocess(
+  (val: any) => {
+    if (typeof val !== "object" || val === null) return val;
+    return {
+      ...val,
+      pathTitle: val.pathTitle || val.title || val.scenarioTitle || val.name || "Hypothetical Path",
+      overview: val.overview || val.summary || val.description || "Alternative trajectory overview.",
+      timeline: val.timeline || val.events || val.milestones || [],
+      assumptions: val.assumptions || [],
+      suggestedFollowupQuestions: val.suggestedFollowupQuestions || val.nextDecisions || val.questions || [],
+    };
+  },
+  z.object({
+    id: z.string().optional().default(""),
+    optionLabel: z.string().optional().default("Option"),
+    optionDescription: z.string().optional().default(""),
+    pathTitle: z.string().default("Hypothetical Path"),
+    overview: z.string().default("An alternative future trajectory."),
+    colorTheme: z.enum(["blue", "teal", "lavender", "neutral"]).optional().default("blue"),
+    timeline: z.array(MilestoneEventSchema).default([]),
+    overallUncertainty: z
+      .object({
+        level: z.enum(["lower", "moderate", "higher"]).optional().default("moderate"),
+        reason: z.string().optional().default("Outcome depends on multiple external variables."),
       })
-    )
-    .optional()
-    .default([]),
-});
-
-export const ScenarioAssumptionSchema = z.object({
-  id: z.string().optional().default(""),
-  statement: z.string(),
-  status: z.enum(["likely", "uncertain", "unlikely"]).optional().default("uncertain"),
-});
-
-export const ScenarioPathSchema = z.object({
-  id: z.string().optional().default(""),
-  optionLabel: z.string().optional().default("Option"),
-  optionDescription: z.string().optional().default(""),
-  pathTitle: z.string().default("Hypothetical Path"),
-  overview: z.string().default("An alternative future trajectory."),
-  colorTheme: z.enum(["blue", "teal", "lavender", "neutral"]).optional().default("blue"),
-  timeline: z.array(MilestoneEventSchema).default([]),
-  overallUncertainty: z
-    .object({
-      level: z.enum(["lower", "moderate", "higher"]).optional().default("moderate"),
-      reason: z.string().optional().default("Outcome depends on multiple external variables."),
-    })
-    .optional()
-    .default({
-      level: "moderate",
-      reason: "Outcome depends on multiple external variables.",
-    }),
-  assumptions: z.array(ScenarioAssumptionSchema).optional().default([]),
-  suggestedFollowupQuestions: z.array(z.string()).optional().default([]),
-});
+      .optional()
+      .default({
+        level: "moderate",
+        reason: "Outcome depends on multiple external variables.",
+      }),
+    assumptions: z.array(ScenarioAssumptionSchema).optional().default([]),
+    suggestedFollowupQuestions: z.array(z.string()).optional().default([]),
+  })
+);
 
 export const ScenarioResponseSchema = z.object({
   decisionTitle: z.string().optional().default("Decision Exploration"),

@@ -16,7 +16,15 @@ export async function generateScenariosForDecision(
 
   if (rawAIResponse) {
     try {
-      const parsed = ScenarioResponseSchema.safeParse(rawAIResponse);
+      const normalizedAI = Array.isArray(rawAIResponse)
+        ? { scenarios: rawAIResponse, decisionTitle: input.decision }
+        : {
+            ...rawAIResponse,
+            scenarios: rawAIResponse.scenarios || rawAIResponse.paths || [],
+            decisionTitle: rawAIResponse.decisionTitle || rawAIResponse.title || input.decision,
+          };
+
+      const parsed = ScenarioResponseSchema.safeParse(normalizedAI);
       if (parsed.success && parsed.data.scenarios.length >= 2) {
         return {
           id: generateId("replay"),
@@ -24,6 +32,8 @@ export async function generateScenariosForDecision(
           decision: input.decision,
           options: input.options,
           context: input.context,
+          userProfile: input.userProfile,
+          diagnostics: input.diagnostics,
           priorities: input.priorities,
           branchesExploredCount: 0,
           createdAt: new Date().toISOString(),
@@ -64,5 +74,10 @@ export async function generateScenariosForDecision(
     }
   }
 
-  return generateMockScenarios(input);
+  const mock = generateMockScenarios(input);
+  return {
+    ...mock,
+    userProfile: input.userProfile,
+    diagnostics: input.diagnostics,
+  };
 }

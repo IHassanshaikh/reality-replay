@@ -3,23 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --background: #F6F8FC;
+  --background: #F4F7FB;
   --surface: #FFFFFF;
-  --primary: #315B82;
-  --primary-hover: #264868;
-  --primary-light: #EBF2F8;
-  --secondary: #6687A8;
-  --secondary-hover: #526f8d;
-  --teal: #399C91;
-  --teal-light: #EBF7F5;
-  --lavender: #918AC7;
-  --lavender-light: #F2F1FA;
-  --sky: #DCEAF5;
-  --sky-soft: #F0F6FB;
-  --text-main: #202C3C;
-  --text-body: #59677A;
-  --text-muted: #8995A5;
-  --border: #E7ECF3;
+  --primary: #1B3B6F;
+  --primary-hover: #12284C;
+  --primary-light: #E6EDF8;
+  --secondary: #3B5A7C;
+  --secondary-hover: #2A4461;
+  --teal: #1E8276;
+  --teal-light: #E6F5F3;
+  --lavender: #6D64A8;
+  --lavender-light: #F0EEF8;
+  --sky: #B8D0E8;
+  --sky-soft: #EBF2F9;
+  --text-main: #0B1528;
+  --text-body: #33435C;
+  --text-muted: #64748B;
+  --border: #DCE5F0;
 }
 
 body {
@@ -32,6 +32,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-manrope), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text-main);
 }
 
 /* Custom Scrollbars */
@@ -59,17 +60,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .react-flow__handle {
-  width: 8px !important;
-  height: 8px !important;
+  width: 9px !important;
+  height: 9px !important;
   border-radius: 50% !important;
   border: 2px solid white !important;
 }
 
 .react-flow__edge-path {
-  stroke-width: 2.5;
+  stroke-width: 2.8;
   transition: stroke 0.2s, stroke-width 0.2s;
 }
 
 .react-flow__edge.selected .react-flow__edge-path {
-  stroke-width: 3.5;
+  stroke-width: 4;
 }

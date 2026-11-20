@@ -100,7 +100,7 @@ export function LandingView() {
                     onClick={() => setActiveHeroPath("a")}
                     className={`py-2 px-3 rounded-xl text-xs font-semibold font-heading transition-all ${
                       activeHeroPath === "a"
-                        ? "bg-[#315B82] text-white shadow-subtle"
+                        ? "bg-[#1B3B6F] text-white shadow-subtle"
                         : "bg-background text-text-body hover:bg-sky-soft"
                     }`}
                   >
@@ -110,7 +110,7 @@ export function LandingView() {
                     onClick={() => setActiveHeroPath("b")}
                     className={`py-2 px-3 rounded-xl text-xs font-semibold font-heading transition-all ${
                       activeHeroPath === "b"
-                        ? "bg-[#399C91] text-white shadow-subtle"
+                        ? "bg-[#1E8276] text-white shadow-subtle"
                         : "bg-background text-text-body hover:bg-sky-soft"
                     }`}
                   >
@@ -120,7 +120,7 @@ export function LandingView() {
                     onClick={() => setActiveHeroPath("c")}
                     className={`py-2 px-3 rounded-xl text-xs font-semibold font-heading transition-all ${
                       activeHeroPath === "c"
-                        ? "bg-[#918AC7] text-white shadow-subtle"
+                        ? "bg-[#6D64A8] text-white shadow-subtle"
                         : "bg-background text-text-body hover:bg-sky-soft"
                     }`}
                   >
@@ -135,10 +135,10 @@ export function LandingView() {
                     <span
                       className={`absolute -left-[27px] top-1.5 w-3.5 h-3.5 rounded-full border-2 border-surface ${
                         activeHeroPath === "a"
-                          ? "bg-[#315B82]"
+                          ? "bg-[#1B3B6F]"
                           : activeHeroPath === "b"
-                          ? "bg-[#399C91]"
-                          : "bg-[#918AC7]"
+                          ? "bg-[#1E8276]"
+                          : "bg-[#6D64A8]"
                       }`}
                     />
                     <div className="p-3.5 rounded-xl border border-border bg-background group-hover:border-primary/40 transition-colors shadow-subtle">
@@ -159,10 +159,10 @@ export function LandingView() {
                     <span
                       className={`absolute -left-[27px] top-1.5 w-3.5 h-3.5 rounded-full border-2 border-surface ${
                         activeHeroPath === "a"
-                          ? "bg-[#315B82]"
+                          ? "bg-[#1B3B6F]"
                           : activeHeroPath === "b"
-                          ? "bg-[#399C91]"
-                          : "bg-[#918AC7]"
+                          ? "bg-[#1E8276]"
+                          : "bg-[#6D64A8]"
                       }`}
                     />
                     <div className="p-3.5 rounded-xl border-2 border-primary/30 bg-primary-light/30 group-hover:border-primary transition-colors shadow-subtle">
@@ -186,10 +186,10 @@ export function LandingView() {
                     <span
                       className={`absolute -left-[27px] top-1.5 w-3.5 h-3.5 rounded-full border-2 border-surface ${
                         activeHeroPath === "a"
-                          ? "bg-[#315B82]"
+                          ? "bg-[#1B3B6F]"
                           : activeHeroPath === "b"
-                          ? "bg-[#399C91]"
-                          : "bg-[#918AC7]"
+                          ? "bg-[#1E8276]"
+                          : "bg-[#6D64A8]"
                       }`}
                     />
                     <div className="p-3.5 rounded-xl border border-border bg-background group-hover:border-primary/40 transition-colors shadow-subtle">

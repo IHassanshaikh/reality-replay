@@ -27,6 +27,8 @@ export function buildReplayGraph(
       decision: replay.decision,
       optionsCount: replay.options.length,
       priorities: replay.priorities,
+      userProfile: replay.userProfile,
+      diagnostics: replay.diagnostics,
     },
     sourcePosition: Position.Right,
     targetPosition: Position.Left,
