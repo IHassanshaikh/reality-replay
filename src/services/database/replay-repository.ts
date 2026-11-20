@@ -1,14 +1,10 @@
+import fs from "fs";
+import path from "path";
 import { DecisionReplay, ScenarioAssumption, ScenarioPath } from "@/types";
 import { SHOWCASE_REPLAY } from "../ai/showcase-data";
 
-// In-memory server store with initial rich seeds
-const memoryStore = new Map<string, DecisionReplay>();
-
-// Seed initial showcase replay
-memoryStore.set(SHOWCASE_REPLAY.id, SHOWCASE_REPLAY);
-
 // Seed second demo replay: Startup vs Job
-const SECOND_DEMO_REPLAY: DecisionReplay = {
+export const SECOND_DEMO_REPLAY: DecisionReplay = {
   id: "replay_startup_vs_corp",
   title: "Leaving Corporate Engineering to Co-Found a B2B AI Workflow Platform",
   decision: "Should I stay at my senior engineer position or leave to start a B2B SaaS startup with an ex-colleague?",
@@ -31,7 +27,7 @@ const SECOND_DEMO_REPLAY: DecisionReplay = {
   ],
   context: {
     currentSituation: "Senior Engineer at mid-sized tech company with stock vesting every quarter.",
-    resources: "\$85,000 liquid savings, deep backend distributed systems expertise.",
+    resources: "$85,000 liquid savings, deep backend distributed systems expertise.",
     constraints: ["Non-compete clauses on company hardware", "Mortgage payments require steady cashflow"],
     timeHorizon: "3 years",
     relevantExperience: "8 years in software architecture, 2 open-source libraries with 5k stars.",
@@ -87,7 +83,7 @@ const SECOND_DEMO_REPLAY: DecisionReplay = {
           horizonLabel: "Year 1 · Staff Review Board",
           title: "Promotion Confirmed: Staff Software Engineer",
           description: "Your promotion goes through with a 22% total compensation bump and accelerated refresher grants.",
-          opportunities: ["Total compensation hits \$340,000/year", "Mentoring 6 senior engineers"],
+          opportunities: ["Total compensation hits $340,000/year", "Mentoring 6 senior engineers"],
           challenges: ["Very little hands-on coding; 70% calendar spent in design reviews"],
           assumptions: ["Company performance meets shareholder expectations"],
           uncertaintyLevel: "moderate",
@@ -152,8 +148,8 @@ const SECOND_DEMO_REPLAY: DecisionReplay = {
         {
           id: "evt_l2",
           horizon: "1_year",
-          horizonLabel: "Year 1 · Seed Round & \$240k ARR",
-          title: "Closing \$1.8M Seed Round from Top Tier VC",
+          horizonLabel: "Year 1 · Seed Round & $240k ARR",
+          title: "Closing $1.8M Seed Round from Top Tier VC",
           description: "Backed by 4 paying enterprise contracts, you close institutional seed funding and hire your first two backend engineers.",
           opportunities: ["Substantial runway for 24 months", "Validation from tier-1 investors"],
           challenges: ["Now accountable to a board of directors; monthly investor updates"],
@@ -166,9 +162,9 @@ const SECOND_DEMO_REPLAY: DecisionReplay = {
           id: "evt_l3",
           horizon: "3_years",
           horizonLabel: "Year 3 · Series A Scale or Churn Squeeze",
-          title: "\$1.4M ARR & 14-Person Team",
+          title: "$1.4M ARR & 14-Person Team",
           description: "Your product becomes a recognized player in automated data reconciliation. You lead engineering while your co-founder leads sales.",
-          opportunities: ["Your 40% equity is now valued at \$6M on paper", "Deep pride in building an enduring entity"],
+          opportunities: ["Your 40% equity is now valued at $6M on paper", "Deep pride in building an enduring entity"],
           challenges: ["Constant hiring and personnel management replaces coding time"],
           assumptions: ["Competitors do not bundle your product as a free feature"],
           uncertaintyLevel: "higher",
@@ -214,7 +210,7 @@ const SECOND_DEMO_REPLAY: DecisionReplay = {
           id: "evt_h2",
           horizon: "1_year",
           horizonLabel: "Year 1 · De-risked Launch",
-          title: "First \$3k/mo Revenue Before Quitting",
+          title: "First $3k/mo Revenue Before Quitting",
           description: "With 3 paying customers live, you have concrete proof of product-market fit before ever taking a leap of faith.",
           opportunities: ["Ability to resign with absolute confidence rather than blind hope"],
           challenges: ["Physical fatigue from operating dual tracks for 12 months"],
@@ -228,7 +224,7 @@ const SECOND_DEMO_REPLAY: DecisionReplay = {
           horizon: "3_years",
           horizonLabel: "Year 3 · Clean Full-Time Transition",
           title: "Profitable Bootstrapped Studio",
-          description: "You transitioned to full-time founder 18 months ago. You now run a lean, profitable \$40k MRR business with no external debt.",
+          description: "You transitioned to full-time founder 18 months ago. You now run a lean, profitable $40k MRR business with no external debt.",
           opportunities: ["Complete balance of freedom, financial health, and equity"],
           challenges: ["Took 12 months longer to reach this milestone than going all-in"],
           assumptions: ["Market opportunity remained patient during the slower build"],
@@ -241,30 +237,103 @@ const SECOND_DEMO_REPLAY: DecisionReplay = {
   ],
 };
 
-memoryStore.set(SECOND_DEMO_REPLAY.id, SECOND_DEMO_REPLAY);
+// File-based backup persistence
+const DATA_DIR = path.join(process.cwd(), ".data");
+const DATA_FILE = path.join(DATA_DIR, "replays.json");
+
+function ensureDataFile() {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (!fs.existsSync(DATA_FILE)) {
+      const initial: Record<string, DecisionReplay> = {
+        [SHOWCASE_REPLAY.id]: SHOWCASE_REPLAY,
+        [SECOND_DEMO_REPLAY.id]: SECOND_DEMO_REPLAY,
+      };
+      fs.writeFileSync(DATA_FILE, JSON.stringify(initial, null, 2), "utf-8");
+    }
+  } catch (e) {
+    console.warn("Could not ensure data file:", e);
+  }
+}
+
+function loadFromDisk(): Map<string, DecisionReplay> {
+  const store = new Map<string, DecisionReplay>();
+  store.set(SHOWCASE_REPLAY.id, SHOWCASE_REPLAY);
+  store.set(SECOND_DEMO_REPLAY.id, SECOND_DEMO_REPLAY);
+
+  try {
+    ensureDataFile();
+    if (fs.existsSync(DATA_FILE)) {
+      const raw = fs.readFileSync(DATA_FILE, "utf-8");
+      const parsed = JSON.parse(raw);
+      for (const [k, v] of Object.entries(parsed)) {
+        store.set(k, v as DecisionReplay);
+      }
+    }
+  } catch (e) {
+    console.warn("Could not load from disk:", e);
+  }
+  return store;
+}
+
+function persistToDisk(store: Map<string, DecisionReplay>) {
+  try {
+    ensureDataFile();
+    const obj: Record<string, DecisionReplay> = {};
+    for (const [k, v] of store.entries()) {
+      obj[k] = v;
+    }
+    fs.writeFileSync(DATA_FILE, JSON.stringify(obj, null, 2), "utf-8");
+  } catch (e) {
+    console.warn("Could not persist to disk:", e);
+  }
+}
+
+// Global memory store persistent across Next.js dev server hot-reloads
+const globalForReplays = globalThis as unknown as {
+  replayMemoryStore?: Map<string, DecisionReplay>;
+};
+
+const memoryStore = globalForReplays.replayMemoryStore ?? loadFromDisk();
+
+if (!globalForReplays.replayMemoryStore) {
+  globalForReplays.replayMemoryStore = memoryStore;
+}
 
 export const ReplayRepository = {
   async getAll(): Promise<DecisionReplay[]> {
-    return Array.from(memoryStore.values()).sort(
+    const store = globalForReplays.replayMemoryStore ?? loadFromDisk();
+    return Array.from(store.values()).sort(
       (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     );
   },
 
   async getById(id: string): Promise<DecisionReplay | null> {
-    return memoryStore.get(id) || null;
+    const store = globalForReplays.replayMemoryStore ?? loadFromDisk();
+    return store.get(id) || null;
   },
 
   async save(replay: DecisionReplay): Promise<DecisionReplay> {
+    const store = globalForReplays.replayMemoryStore ?? loadFromDisk();
     const updated = {
       ...replay,
       updatedAt: new Date().toISOString(),
     };
-    memoryStore.set(updated.id, updated);
+    store.set(updated.id, updated);
+    globalForReplays.replayMemoryStore = store;
+    persistToDisk(store);
     return updated;
   },
 
   async delete(id: string): Promise<boolean> {
-    return memoryStore.delete(id);
+    const store = globalForReplays.replayMemoryStore ?? loadFromDisk();
+    const deleted = store.delete(id);
+    if (deleted) {
+      persistToDisk(store);
+    }
+    return deleted;
   },
 
   async updateAssumptions(
@@ -272,7 +341,8 @@ export const ReplayRepository = {
     scenarioId: string,
     updatedAssumptions: ScenarioAssumption[]
   ): Promise<DecisionReplay | null> {
-    const replay = memoryStore.get(replayId);
+    const store = globalForReplays.replayMemoryStore ?? loadFromDisk();
+    const replay = store.get(replayId);
     if (!replay) return null;
 
     const updatedScenarios = replay.scenarios.map((sc) => {
@@ -291,7 +361,8 @@ export const ReplayRepository = {
       updatedAt: new Date().toISOString(),
     };
 
-    memoryStore.set(replayId, updatedReplay);
+    store.set(replayId, updatedReplay);
+    persistToDisk(store);
     return updatedReplay;
   },
 
@@ -299,7 +370,8 @@ export const ReplayRepository = {
     replayId: string,
     childScenarios: ScenarioPath[]
   ): Promise<DecisionReplay | null> {
-    const replay = memoryStore.get(replayId);
+    const store = globalForReplays.replayMemoryStore ?? loadFromDisk();
+    const replay = store.get(replayId);
     if (!replay) return null;
 
     const updatedReplay: DecisionReplay = {
@@ -309,7 +381,8 @@ export const ReplayRepository = {
       updatedAt: new Date().toISOString(),
     };
 
-    memoryStore.set(replayId, updatedReplay);
+    store.set(replayId, updatedReplay);
+    persistToDisk(store);
     return updatedReplay;
   },
 };

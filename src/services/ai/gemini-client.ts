@@ -10,7 +10,7 @@ export function getGeminiModel() {
   const genAI = new GoogleGenerativeAI(apiKey);
   // Default to fast, high-quality structured output model gemini-1.5-flash
   return genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model: "gemini-2.5-flash",
     systemInstruction: MASTER_SYSTEM_PROMPT,
     generationConfig: {
       responseMimeType: "application/json",

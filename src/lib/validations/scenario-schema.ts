@@ -1,50 +1,59 @@
 import { z } from "zod";
 
 export const MilestoneEventSchema = z.object({
-  id: z.string(),
-  horizon: z.enum(["3_months", "1_year", "3_years"]),
-  horizonLabel: z.string(),
-  title: z.string(),
-  description: z.string(),
-  opportunities: z.array(z.string()),
-  challenges: z.array(z.string()),
-  assumptions: z.array(z.string()),
-  uncertaintyLevel: z.enum(["lower", "moderate", "higher"]),
-  uncertaintyReason: z.string(),
-  turningPoints: z.array(
-    z.object({
-      title: z.string(),
-      description: z.string(),
-      possibleImpact: z.string(),
-    })
-  ),
+  id: z.string().optional().default(""),
+  horizon: z.enum(["3_months", "1_year", "3_years"]).optional().default("1_year"),
+  horizonLabel: z.string().optional().default("Milestone Horizon"),
+  title: z.string().default("Milestone"),
+  description: z.string().default("Hypothetical development event."),
+  opportunities: z.array(z.string()).optional().default([]),
+  challenges: z.array(z.string()).optional().default([]),
+  assumptions: z.array(z.string()).optional().default([]),
+  uncertaintyLevel: z.enum(["lower", "moderate", "higher"]).optional().default("moderate"),
+  uncertaintyReason: z.string().optional().default("General uncertainty across this horizon."),
+  turningPoints: z
+    .array(
+      z.object({
+        title: z.string().default("Turning Point"),
+        description: z.string().default("Catalyst event"),
+        possibleImpact: z.string().default("High potential impact on trajectory"),
+      })
+    )
+    .optional()
+    .default([]),
 });
 
 export const ScenarioAssumptionSchema = z.object({
-  id: z.string(),
+  id: z.string().optional().default(""),
   statement: z.string(),
-  status: z.enum(["likely", "uncertain", "unlikely"]).default("uncertain"),
+  status: z.enum(["likely", "uncertain", "unlikely"]).optional().default("uncertain"),
 });
 
 export const ScenarioPathSchema = z.object({
-  id: z.string(),
-  optionLabel: z.string(),
-  optionDescription: z.string(),
-  pathTitle: z.string(),
-  overview: z.string(),
-  colorTheme: z.enum(["blue", "teal", "lavender", "neutral"]),
-  timeline: z.array(MilestoneEventSchema).min(3),
-  overallUncertainty: z.object({
-    level: z.enum(["lower", "moderate", "higher"]),
-    reason: z.string(),
-  }),
-  assumptions: z.array(ScenarioAssumptionSchema),
-  suggestedFollowupQuestions: z.array(z.string()),
+  id: z.string().optional().default(""),
+  optionLabel: z.string().optional().default("Option"),
+  optionDescription: z.string().optional().default(""),
+  pathTitle: z.string().default("Hypothetical Path"),
+  overview: z.string().default("An alternative future trajectory."),
+  colorTheme: z.enum(["blue", "teal", "lavender", "neutral"]).optional().default("blue"),
+  timeline: z.array(MilestoneEventSchema).default([]),
+  overallUncertainty: z
+    .object({
+      level: z.enum(["lower", "moderate", "higher"]).optional().default("moderate"),
+      reason: z.string().optional().default("Outcome depends on multiple external variables."),
+    })
+    .optional()
+    .default({
+      level: "moderate",
+      reason: "Outcome depends on multiple external variables.",
+    }),
+  assumptions: z.array(ScenarioAssumptionSchema).optional().default([]),
+  suggestedFollowupQuestions: z.array(z.string()).optional().default([]),
 });
 
 export const ScenarioResponseSchema = z.object({
-  decisionTitle: z.string(),
-  scenarios: z.array(ScenarioPathSchema).min(2),
+  decisionTitle: z.string().optional().default("Decision Exploration"),
+  scenarios: z.array(ScenarioPathSchema).default([]),
 });
 
 export const BranchGenerationRequestSchema = z.object({
@@ -56,26 +65,30 @@ export const BranchGenerationRequestSchema = z.object({
 });
 
 export const BranchGenerationResponseSchema = z.object({
-  parentEventTitle: z.string(),
-  branchPrompt: z.string(),
-  childScenarios: z.array(ScenarioPathSchema).min(2),
+  parentEventTitle: z.string().optional().default("Branch Point"),
+  branchPrompt: z.string().optional().default("New branch dilemma"),
+  childScenarios: z.array(ScenarioPathSchema).default([]),
 });
 
 export const ComparisonResponseSchema = z.object({
-  dimensions: z.array(
-    z.object({
-      dimension: z.string(),
-      assessment: z.record(z.string()),
-      explanation: z.string(),
-    })
-  ),
-  keyDifferences: z.array(z.string()),
-  importantUnknowns: z.array(z.string()),
-  priorityAlignment: z.array(
-    z.object({
-      priority: z.string(),
-      bestAlignedPathId: z.string(),
-      rationale: z.string(),
-    })
-  ),
+  dimensions: z
+    .array(
+      z.object({
+        dimension: z.string(),
+        assessment: z.record(z.string()).default({}),
+        explanation: z.string().default(""),
+      })
+    )
+    .default([]),
+  keyDifferences: z.array(z.string()).default([]),
+  importantUnknowns: z.array(z.string()).default([]),
+  priorityAlignment: z
+    .array(
+      z.object({
+        priority: z.string(),
+        bestAlignedPathId: z.string(),
+        rationale: z.string(),
+      })
+    )
+    .default([]),
 });
