@@ -27,7 +27,7 @@ export async function generateBranchScenarios(params: {
   if (rawAI) {
     try {
       const parsed = BranchGenerationResponseSchema.safeParse(rawAI);
-      if (parsed.success) {
+      if (parsed.success && parsed.data.childScenarios.length > 0) {
         return parsed.data.childScenarios.map((cs, idx) => ({
           ...cs,
           id: cs.id || generateId(`branch_${params.parentScenario.id}`),

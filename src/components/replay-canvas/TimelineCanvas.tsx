@@ -12,14 +12,15 @@ import {
   Edge,
   BackgroundVariant,
 } from "@xyflow/react";
-import { DecisionReplay, MilestoneEvent, ScenarioPath } from "@/types";
+import { DecisionReplay, MilestoneEvent, ScenarioPath, ScenarioAssumption } from "@/types";
 import { buildReplayGraph } from "@/lib/layout/tree-layout";
 import { DecisionRootNode } from "./nodes/DecisionRootNode";
 import { TimelineMilestoneNode } from "./nodes/TimelineMilestoneNode";
 import { ScenarioDrawer } from "./ScenarioDrawer";
 import { BranchCreationModal } from "./BranchCreationModal";
+import { AssumptionExplorerModal } from "./AssumptionExplorerModal";
 import { COLOR_THEME_MAP } from "@/lib/constants/design-tokens";
-import { GitBranch, Sparkles, SlidersHorizontal, RefreshCcw } from "lucide-react";
+import { GitBranch, Sparkles, SlidersHorizontal, CheckCircle2, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 interface TimelineCanvasProps {
@@ -36,6 +37,8 @@ export function TimelineCanvas({ initialReplay }: TimelineCanvasProps) {
   const [selectedEvent, setSelectedEvent] = useState<MilestoneEvent | null>(null);
   const [selectedScenario, setSelectedScenario] = useState<ScenarioPath | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isAssumptionModalOpen, setIsAssumptionModalOpen] = useState(false);
+  const [assumptionModalScenarioId, setAssumptionModalScenarioId] = useState<string | undefined>(undefined);
   const [branchModalState, setBranchModalState] = useState<{
     isOpen: boolean;
     event: MilestoneEvent | null;
@@ -94,25 +97,46 @@ export function TimelineCanvas({ initialReplay }: TimelineCanvasProps) {
     }));
   };
 
+  const handleOpenAssumptionExplorer = (scenarioId?: string) => {
+    setAssumptionModalScenarioId(scenarioId || replay.scenarios[0]?.id);
+    setIsAssumptionModalOpen(true);
+  };
+
+  const handleUpdateScenarioAssumptions = (scenarioId: string, updatedAssumptions: ScenarioAssumption[]) => {
+    setReplay((prev) => ({
+      ...prev,
+      scenarios: prev.scenarios.map((s) =>
+        s.id === scenarioId ? { ...s, assumptions: updatedAssumptions } : s
+      ),
+      updatedAt: new Date().toISOString(),
+    }));
+
+    if (selectedScenario && selectedScenario.id === scenarioId) {
+      setSelectedScenario((prev) =>
+        prev ? { ...prev, assumptions: updatedAssumptions } : null
+      );
+    }
+  };
+
   return (
     <div className="relative w-full h-[calc(100vh-4rem)] bg-background overflow-hidden flex flex-col">
       {/* Top Canvas Bar */}
-      <div className="h-14 border-b border-border bg-surface/80 backdrop-blur-md px-6 flex items-center justify-between z-20">
+      <div className="h-14 border-b border-border bg-surface/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between z-20">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
             <h2 className="font-heading font-bold text-sm text-text-main line-clamp-1 max-w-md">
               {replay.title}
             </h2>
           </div>
-          <span className="text-xs font-mono text-text-muted hidden sm:inline-block">
+          <span className="text-xs font-mono text-text-muted hidden md:inline-block">
             ({replay.scenarios.length} timelines · {replay.branchesExploredCount} branches)
           </span>
         </div>
 
         {/* Legend & Action Shortcuts */}
-        <div className="flex items-center gap-3">
-          <div className="hidden lg:flex items-center gap-2 pr-3 border-r border-border">
+        <div className="flex items-center gap-2.5">
+          <div className="hidden xl:flex items-center gap-2 pr-3 border-r border-border">
             {replay.scenarios
               .filter((s) => !s.parentScenarioId)
               .map((s) => {
@@ -132,9 +156,22 @@ export function TimelineCanvas({ initialReplay }: TimelineCanvasProps) {
               })}
           </div>
 
+          {/* Assumption Explorer Action */}
+          <button
+            type="button"
+            onClick={() => handleOpenAssumptionExplorer()}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-background hover:bg-sky-soft border border-border text-text-main hover:text-primary transition-colors"
+            title="Inspect What Needs to Be True"
+          >
+            <CheckCircle2 className="w-3.5 h-3.5 text-secondary" />
+            <span className="hidden sm:inline">Assumption Explorer</span>
+            <span className="sm:hidden">Assumptions</span>
+          </button>
+
+          {/* Compare Futures Action */}
           <Link
             href={`/replay/${replay.id}/compare`}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-background hover:bg-sky-soft border border-border text-primary transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-primary text-white hover:bg-primary-hover shadow-subtle transition-all active:scale-[0.98]"
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
             <span>Compare Futures</span>
@@ -189,7 +226,19 @@ export function TimelineCanvas({ initialReplay }: TimelineCanvasProps) {
         onClose={() => setIsDrawerOpen(false)}
         event={selectedEvent}
         scenario={selectedScenario}
+        replayId={replay.id}
         onExploreBranch={handleOpenBranchModal}
+        onOpenAssumptionExplorer={handleOpenAssumptionExplorer}
+        onUpdateScenarioAssumptions={handleUpdateScenarioAssumptions}
+      />
+
+      {/* Assumption Explorer Modal */}
+      <AssumptionExplorerModal
+        isOpen={isAssumptionModalOpen}
+        onClose={() => setIsAssumptionModalOpen(false)}
+        replay={replay}
+        activeScenarioId={assumptionModalScenarioId}
+        onUpdateReplay={(updated) => setReplay(updated)}
       />
 
       {/* Branch Creation Modal */}

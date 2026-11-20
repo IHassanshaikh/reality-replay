@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { MilestoneEvent, ScenarioPath, UncertaintyLevel } from "@/types";
+import { MilestoneEvent, ScenarioPath, UncertaintyLevel, ScenarioAssumption, AssumptionStatus } from "@/types";
 import { COLOR_THEME_MAP } from "@/lib/constants/design-tokens";
 import { UncertaintyBadge } from "@/components/shared/UncertaintyBadge";
 import {
@@ -16,6 +16,9 @@ import {
   HelpCircle,
   Plus,
   Compass,
+  SlidersHorizontal,
+  Check,
+  ShieldAlert,
 } from "lucide-react";
 
 interface ScenarioDrawerProps {
@@ -23,7 +26,10 @@ interface ScenarioDrawerProps {
   onClose: () => void;
   event: MilestoneEvent | null;
   scenario: ScenarioPath | null;
+  replayId?: string;
   onExploreBranch: (event: MilestoneEvent, scenario: ScenarioPath) => void;
+  onOpenAssumptionExplorer?: (scenarioId: string) => void;
+  onUpdateScenarioAssumptions?: (scenarioId: string, updatedAssumptions: ScenarioAssumption[]) => void;
 }
 
 export function ScenarioDrawer({
@@ -31,11 +37,40 @@ export function ScenarioDrawer({
   onClose,
   event,
   scenario,
+  replayId,
   onExploreBranch,
+  onOpenAssumptionExplorer,
+  onUpdateScenarioAssumptions,
 }: ScenarioDrawerProps) {
   if (!isOpen || !event || !scenario) return null;
 
   const theme = COLOR_THEME_MAP[scenario.colorTheme] || COLOR_THEME_MAP.blue;
+  const assumptions = scenario.assumptions || [];
+
+  const handleToggleStatus = async (assumptionId: string, newStatus: AssumptionStatus) => {
+    const updated = assumptions.map((a) =>
+      a.id === assumptionId ? { ...a, status: newStatus } : a
+    );
+
+    if (onUpdateScenarioAssumptions) {
+      onUpdateScenarioAssumptions(scenario.id, updated);
+    }
+
+    if (replayId) {
+      try {
+        await fetch(`/api/scenarios/${scenario.id}/assumptions`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            replayId,
+            assumptions: updated,
+          }),
+        });
+      } catch (err) {
+        console.error("Failed to update assumption in drawer:", err);
+      }
+    }
+  };
 
   return (
     <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[500px] lg:w-[540px] bg-surface shadow-2xl border-l border-border flex flex-col transform transition-transform duration-300 ease-in-out">
@@ -138,28 +173,104 @@ export function ScenarioDrawer({
           </div>
         </div>
 
-        {/* Section 4: Underlying Assumptions */}
-        {event.assumptions && event.assumptions.length > 0 && (
-          <div className="space-y-2.5">
+        {/* Section 4: Interactive Assumption Explorer (Feature 6) */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
             <h4 className="text-xs font-mono uppercase text-text-muted tracking-wider flex items-center gap-1.5 font-semibold">
               <CheckCircle className="w-3.5 h-3.5 text-secondary" />
-              What Needs to Be True
+              Assumption Explorer (What Needs to Be True)
             </h4>
-            <div className="space-y-2">
-              {event.assumptions.map((asm, idx) => (
+            {onOpenAssumptionExplorer && (
+              <button
+                type="button"
+                onClick={() => onOpenAssumptionExplorer(scenario.id)}
+                className="text-xs font-medium text-primary hover:underline flex items-center gap-1"
+              >
+                <SlidersHorizontal className="w-3 h-3" />
+                <span>Full Explorer</span>
+              </button>
+            )}
+          </div>
+
+          {assumptions.length > 0 ? (
+            <div className="space-y-2.5">
+              {assumptions.map((asm, idx) => (
                 <div
-                  key={idx}
-                  className="p-3 rounded-lg border border-border bg-surface text-xs text-text-body flex items-start gap-2 shadow-subtle"
+                  key={asm.id || idx}
+                  className="p-3 rounded-xl border border-border bg-surface text-xs text-text-body space-y-2 shadow-subtle hover:border-secondary/30 transition-colors"
                 >
-                  <span className="text-secondary font-mono font-bold mt-0.5">
-                    {idx + 1}.
-                  </span>
-                  <span>{asm}</span>
+                  <div className="flex items-start gap-2">
+                    <span className="text-secondary font-mono font-bold mt-0.5">
+                      {idx + 1}.
+                    </span>
+                    <span className="flex-1 text-xs font-medium text-text-main leading-relaxed">
+                      {asm.statement}
+                    </span>
+                  </div>
+
+                  {/* Interactive Status Pills */}
+                  <div className="flex items-center justify-between pt-1 border-t border-border/50 text-[11px]">
+                    <span className="text-text-muted text-[10px] font-mono uppercase tracking-wider">
+                      Status:
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleStatus(asm.id, "likely")}
+                        className={`px-2 py-0.5 rounded text-[10px] font-heading font-semibold transition-all border ${
+                          asm.status === "likely"
+                            ? "bg-emerald-600 text-white border-emerald-600"
+                            : "bg-surface hover:bg-emerald-50 text-emerald-800 border-emerald-200"
+                        }`}
+                      >
+                        Likely
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleStatus(asm.id, "uncertain")}
+                        className={`px-2 py-0.5 rounded text-[10px] font-heading font-semibold transition-all border ${
+                          asm.status === "uncertain"
+                            ? "bg-amber-600 text-white border-amber-600"
+                            : "bg-surface hover:bg-amber-50 text-amber-800 border-amber-200"
+                        }`}
+                      >
+                        Uncertain
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleStatus(asm.id, "unlikely")}
+                        className={`px-2 py-0.5 rounded text-[10px] font-heading font-semibold transition-all border ${
+                          asm.status === "unlikely"
+                            ? "bg-rose-600 text-white border-rose-600"
+                            : "bg-surface hover:bg-rose-50 text-rose-800 border-rose-200"
+                        }`}
+                      >
+                        Unlikely
+                      </button>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            /* Fallback to event string assumptions if scenario assumptions is empty */
+            event.assumptions && event.assumptions.length > 0 && (
+              <div className="space-y-2">
+                {event.assumptions.map((asm, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 rounded-lg border border-border bg-surface text-xs text-text-body flex items-start gap-2 shadow-subtle"
+                  >
+                    <span className="text-secondary font-mono font-bold mt-0.5">
+                      {idx + 1}.
+                    </span>
+                    <span>{asm}</span>
+                  </div>
+                ))}
+              </div>
+            )
+          )}
+        </div>
 
         {/* Section 5: Potential Turning Points */}
         {event.turningPoints && event.turningPoints.length > 0 && (

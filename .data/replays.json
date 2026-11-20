@@ -35,9 +35,9 @@
       "Personal freedom & autonomy",
       "Financial stability"
     ],
-    "branchesExploredCount": 2,
+    "branchesExploredCount": 4,
     "createdAt": "2026-11-20T10:00:00.000Z",
-    "updatedAt": "2026-11-20T14:30:00.000Z",
+    "updatedAt": "2026-11-20T15:52:35.831Z",
     "scenarios": [
       {
         "id": "path_univ",
@@ -52,19 +52,19 @@
         },
         "assumptions": [
           {
+            "status": "likely",
             "id": "asm_a1",
-            "statement": "Top academic standing will translate directly into premier postgraduate or R&D roles.",
-            "status": "likely"
+            "statement": "Top academic standing will translate directly into premier postgraduate or R&D roles."
           },
           {
+            "status": "uncertain",
             "id": "asm_a2",
-            "statement": "Delaying commercial product shipping won't diminish practical market edge.",
-            "status": "uncertain"
+            "statement": "Delaying commercial product shipping won't diminish practical market edge."
           },
           {
+            "status": "likely",
             "id": "asm_a3",
-            "statement": "Tuition and living costs remain comfortably sustainable without external income.",
-            "status": "likely"
+            "statement": "Tuition and living costs remain comfortably sustainable without external income."
           }
         ],
         "suggestedFollowupQuestions": [
@@ -384,6 +384,160 @@
                 "possibleImpact": "Life-changing financial liquidity in your early twenties."
               }
             ]
+          }
+        ]
+      },
+      {
+        "id": "branch_path_univ_9p1hz1z_mwp5qz1z",
+        "optionLabel": "Branch A",
+        "optionDescription": "Take 1-year corporate research sabbatical at top AI lab",
+        "pathTitle": "Pivot: Take 1-year corporate research s...",
+        "overview": "Child timeline branching from \"First Tier-1 Conference Submission\" at Year 1 · Specialization & Recognition. Exploring: Take 1-year corporate research sabbatical at top AI lab",
+        "colorTheme": "lavender",
+        "parentScenarioId": "path_univ",
+        "parentEventId": "evt_a_1y",
+        "branchDepth": 2,
+        "overallUncertainty": {
+          "level": "moderate",
+          "reason": "Branching outcomes introduce new localized uncertainties."
+        },
+        "assumptions": [
+          {
+            "id": "asm_b1_6u0i8ms_mwp5qz1z",
+            "statement": "The decision to \"Take 1-year corporate research sabbatical at top AI lab\" can be executed within 60 days.",
+            "status": "likely"
+          },
+          {
+            "id": "asm_b2_wtp1fv1_mwp5qz1z",
+            "statement": "Parent timeline momentum is not completely lost during this pivot.",
+            "status": "uncertain"
+          }
+        ],
+        "suggestedFollowupQuestions": [
+          "What if the team or market resists this strategic shift?"
+        ],
+        "timeline": [
+          {
+            "id": "evt_child_0_6m_2yu4xdc_mwp5qz1z",
+            "horizon": "1_year",
+            "horizonLabel": "Branch Horizon +6 Months",
+            "title": "Immediate Aftermath of: Take 1-year corporate research",
+            "description": "After choosing to \"Take 1-year corporate research sabbatical at top AI lab\", you observe immediate downstream effects on your primary goals.",
+            "opportunities": [
+              "Resolution of the dilemma that triggered this branch",
+              "Renewed focus on the newly chosen sub-strategy"
+            ],
+            "challenges": [
+              "Temporary friction from shifting operational direction"
+            ],
+            "assumptions": [
+              "Key stakeholders align with the revised roadmap"
+            ],
+            "uncertaintyLevel": "moderate",
+            "uncertaintyReason": "New direction requires fresh validation.",
+            "turningPoints": [
+              {
+                "title": "Branching Validation Moment",
+                "description": "A clear early indicator signals whether this branch was superior.",
+                "possibleImpact": "Provides confidence to double down."
+              }
+            ]
+          },
+          {
+            "id": "evt_child_0_3y_dwi8btm_mwp5qz1z",
+            "horizon": "3_years",
+            "horizonLabel": "Branch Horizon +2 Years",
+            "title": "Long-term Resolution of the Take 1-year corporate re Branch",
+            "description": "The ripple effects of this mid-stream decision solidify into your steady-state situation.",
+            "opportunities": [
+              "Distinct competitive or personal differentiation from this unique choice"
+            ],
+            "challenges": [
+              "Living with the permanent departure from the original parent path"
+            ],
+            "assumptions": [
+              "External landscape continues to support this branch"
+            ],
+            "uncertaintyLevel": "moderate",
+            "uncertaintyReason": "Long-term compounding of a secondary decision.",
+            "turningPoints": []
+          }
+        ]
+      },
+      {
+        "id": "branch_path_univ_30i6vrk_mwp5qz1z",
+        "optionLabel": "Branch B",
+        "optionDescription": "Apply for direct PhD transfer and publish dissertation early",
+        "pathTitle": "Pivot: Apply for direct PhD transfer an...",
+        "overview": "Child timeline branching from \"First Tier-1 Conference Submission\" at Year 1 · Specialization & Recognition. Exploring: Apply for direct PhD transfer and publish dissertation early",
+        "colorTheme": "teal",
+        "parentScenarioId": "path_univ",
+        "parentEventId": "evt_a_1y",
+        "branchDepth": 2,
+        "overallUncertainty": {
+          "level": "moderate",
+          "reason": "Branching outcomes introduce new localized uncertainties."
+        },
+        "assumptions": [
+          {
+            "id": "asm_b1_seqkpox_mwp5qz1z",
+            "statement": "The decision to \"Apply for direct PhD transfer and publish dissertation early\" can be executed within 60 days.",
+            "status": "likely"
+          },
+          {
+            "id": "asm_b2_2kzka77_mwp5qz1z",
+            "statement": "Parent timeline momentum is not completely lost during this pivot.",
+            "status": "uncertain"
+          }
+        ],
+        "suggestedFollowupQuestions": [
+          "What if the team or market resists this strategic shift?"
+        ],
+        "timeline": [
+          {
+            "id": "evt_child_1_6m_yudxt6i_mwp5qz1z",
+            "horizon": "1_year",
+            "horizonLabel": "Branch Horizon +6 Months",
+            "title": "Immediate Aftermath of: Apply for direct PhD transfer ",
+            "description": "After choosing to \"Apply for direct PhD transfer and publish dissertation early\", you observe immediate downstream effects on your primary goals.",
+            "opportunities": [
+              "Resolution of the dilemma that triggered this branch",
+              "Renewed focus on the newly chosen sub-strategy"
+            ],
+            "challenges": [
+              "Temporary friction from shifting operational direction"
+            ],
+            "assumptions": [
+              "Key stakeholders align with the revised roadmap"
+            ],
+            "uncertaintyLevel": "moderate",
+            "uncertaintyReason": "New direction requires fresh validation.",
+            "turningPoints": [
+              {
+                "title": "Branching Validation Moment",
+                "description": "A clear early indicator signals whether this branch was superior.",
+                "possibleImpact": "Provides confidence to double down."
+              }
+            ]
+          },
+          {
+            "id": "evt_child_1_3y_smoblqj_mwp5qz1z",
+            "horizon": "3_years",
+            "horizonLabel": "Branch Horizon +2 Years",
+            "title": "Long-term Resolution of the Apply for direct PhD tra Branch",
+            "description": "The ripple effects of this mid-stream decision solidify into your steady-state situation.",
+            "opportunities": [
+              "Distinct competitive or personal differentiation from this unique choice"
+            ],
+            "challenges": [
+              "Living with the permanent departure from the original parent path"
+            ],
+            "assumptions": [
+              "External landscape continues to support this branch"
+            ],
+            "uncertaintyLevel": "moderate",
+            "uncertaintyReason": "Long-term compounding of a secondary decision.",
+            "turningPoints": []
           }
         ]
       }

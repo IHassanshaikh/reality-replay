@@ -193,7 +193,13 @@ export function CompareFuturesView({ replayId }: CompareFuturesViewProps) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {comparison.priorityAlignment.map((pa, idx) => {
-            const matchedPath = paths.find((p) => p.id === pa.bestAlignedPathId) || paths[0];
+            const matchedPath =
+              paths.find(
+                (p) =>
+                  p.id === pa.bestAlignedPathId ||
+                  p.optionLabel.toLowerCase() === pa.bestAlignedPathId.toLowerCase() ||
+                  p.pathTitle.toLowerCase().includes(pa.bestAlignedPathId.toLowerCase())
+              ) || paths[idx % paths.length] || paths[0];
             const theme = COLOR_THEME_MAP[matchedPath.colorTheme] || COLOR_THEME_MAP.blue;
 
             return (
@@ -252,16 +258,28 @@ export function CompareFuturesView({ replayId }: CompareFuturesViewProps) {
                       {dim.explanation}
                     </span>
                   </td>
-                  {paths.map((p) => (
-                    <td
-                      key={p.id}
-                      className="py-4 px-4 text-text-body align-top font-medium"
-                    >
-                      <div className="p-2.5 rounded-lg bg-background border border-border">
-                        {dim.assessment[p.id] || "Moderate trade-off"}
-                      </div>
-                    </td>
-                  ))}
+                  {paths.map((p, pIdx) => {
+                    const assessmentText =
+                      dim.assessment[p.id] ||
+                      dim.assessment[p.optionLabel] ||
+                      dim.assessment[p.pathTitle] ||
+                      Object.entries(dim.assessment).find(([k]) =>
+                        k.toLowerCase().includes(p.optionLabel.toLowerCase())
+                      )?.[1] ||
+                      Object.values(dim.assessment)[pIdx] ||
+                      "Moderate qualitative trade-off";
+
+                    return (
+                      <td
+                        key={p.id}
+                        className="py-4 px-4 text-text-body align-top font-medium"
+                      >
+                        <div className="p-2.5 rounded-lg bg-background border border-border">
+                          {assessmentText}
+                        </div>
+                      </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>

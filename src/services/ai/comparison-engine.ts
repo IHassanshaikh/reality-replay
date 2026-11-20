@@ -20,7 +20,7 @@ export async function generateComparison(replay: DecisionReplay): Promise<Scenar
   if (rawAI) {
     try {
       const parsed = ComparisonResponseSchema.safeParse(rawAI);
-      if (parsed.success) {
+      if (parsed.success && parsed.data.dimensions.length > 0) {
         return {
           replayId: replay.id,
           dimensions: parsed.data.dimensions,

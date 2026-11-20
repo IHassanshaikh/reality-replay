@@ -141,7 +141,47 @@ ${input.options.map((opt, idx) => `Choice ${idx + 1}: ${opt}`).join("\n")}
 INSTRUCTIONS:
 Generate ${input.options.length} divergent child scenario paths stemming directly from this milestone moment.
 For each choice, project how this specific pivot ripples forward across the subsequent milestones up to 3 years.
-Return valid JSON.
+Return valid JSON matching this exact structure:
+{
+  "parentEventTitle": "${input.eventTitle}",
+  "branchPrompt": "${input.newDecision}",
+  "childScenarios": [
+    {
+      "optionLabel": "Branch A",
+      "optionDescription": "Description of choice 1",
+      "pathTitle": "Descriptive Title for Path A",
+      "overview": "Overview of this child path",
+      "colorTheme": "lavender",
+      "overallUncertainty": {
+        "level": "moderate",
+        "reason": "Why uncertainty is moderate"
+      },
+      "assumptions": [
+        {
+          "id": "asm_1",
+          "statement": "Crucial assumption that must hold true",
+          "status": "likely"
+        }
+      ],
+      "suggestedFollowupQuestions": ["Follow up dilemma question"],
+      "timeline": [
+        {
+          "id": "evt_b1",
+          "horizon": "1_year",
+          "horizonLabel": "Year 1 · Immediate Aftermath",
+          "title": "Milestone title",
+          "description": "What happened",
+          "opportunities": ["Opportunity 1"],
+          "challenges": ["Risk 1"],
+          "assumptions": ["Underlying assumption"],
+          "uncertaintyLevel": "moderate",
+          "uncertaintyReason": "Reason for uncertainty",
+          "turningPoints": []
+        }
+      ]
+    }
+  ]
+}
 `;
 }
 
@@ -173,5 +213,34 @@ INSTRUCTIONS:
 2. DO NOT declare one future objectively superior or calculate fake percentages.
 3. Explain which path best aligns with each of the user's specific priorities and why.
 4. Highlight the 3 biggest differences between these futures and the critical unknowns.
+Return valid JSON matching this exact structure:
+{
+  "dimensions": [
+    {
+      "dimension": "Financial Stability",
+      "assessment": {
+        "${input.scenarios[0]?.id || "path_1"}": "Higher upfront stability, lower long-term ceiling",
+        "${input.scenarios[1]?.id || "path_2"}": "High short-term volatility, significant equity upside"
+      },
+      "explanation": "Explanation of financial trade-offs between paths"
+    }
+  ],
+  "keyDifferences": [
+    "Primary difference 1",
+    "Primary difference 2",
+    "Primary difference 3"
+  ],
+  "importantUnknowns": [
+    "Critical unknown 1",
+    "Critical unknown 2"
+  ],
+  "priorityAlignment": [
+    {
+      "priority": "${input.priorities[0] || "Learning opportunities"}",
+      "bestAlignedPathId": "${input.scenarios[0]?.id || "path_1"}",
+      "rationale": "Why this path best aligns with this priority"
+    }
+  ]
+}
 `;
 }

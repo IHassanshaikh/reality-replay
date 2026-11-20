@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { DecisionReplay } from "@/types";
 import { formatDate } from "@/lib/utils";
@@ -14,11 +14,17 @@ import {
   Compass,
   Calendar,
   Layers,
+  Search,
+  CheckCircle2,
+  Briefcase,
+  AlertCircle,
 } from "lucide-react";
 
 export function DashboardView() {
   const [replays, setReplays] = useState<DecisionReplay[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState<"all" | "branched" | "multi">("all");
 
   useEffect(() => {
     async function fetchReplays() {
@@ -52,16 +58,43 @@ export function DashboardView() {
     }
   };
 
+  const filteredReplays = useMemo(() => {
+    return replays.filter((r) => {
+      const q = searchQuery.toLowerCase();
+      const matchesSearch =
+        !searchQuery ||
+        r.title.toLowerCase().includes(q) ||
+        r.decision.toLowerCase().includes(q) ||
+        r.options.some((opt) => opt.text.toLowerCase().includes(q) || opt.label.toLowerCase().includes(q));
+
+      if (!matchesSearch) return false;
+
+      if (filterType === "branched") {
+        return r.branchesExploredCount > 0;
+      }
+      if (filterType === "multi") {
+        return r.scenarios.length >= 3;
+      }
+      return true;
+    });
+  }, [replays, searchQuery, filterType]);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 space-y-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 space-y-8">
       {/* Top Heading */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
         <div>
-          <h1 className="font-heading font-bold text-3xl sm:text-4xl text-text-main">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs font-mono font-semibold text-primary uppercase tracking-wider">
+              Decision Archive
+            </span>
+          </div>
+          <h1 className="font-heading font-extrabold text-3xl sm:text-4xl text-text-main">
             Your Possibilities
           </h1>
           <p className="text-sm text-text-body mt-1">
-            Every decision has more than one story. Revisit, branch, and inspect alternative timelines.
+            Every choice holds alternative storylines. Revisit, branch, and inspect hypothetical timelines.
           </p>
         </div>
 
@@ -72,6 +105,53 @@ export function DashboardView() {
           <Plus className="w-4 h-4" />
           <span>New Decision Replay</span>
         </Link>
+      </div>
+
+      {/* Search & Filter Toolbar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-surface p-3.5 rounded-2xl border border-border shadow-subtle">
+        <div className="relative flex-1 max-w-md">
+          <Search className="w-4 h-4 text-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Search decisions, options, or dilemmas..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full text-xs pl-9 pr-4 py-2 rounded-xl bg-background border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 text-text-main"
+          />
+        </div>
+
+        <div className="flex items-center gap-1.5 self-end sm:self-auto text-xs">
+          <button
+            onClick={() => setFilterType("all")}
+            className={`px-3 py-1.5 rounded-lg font-heading font-semibold transition-all ${
+              filterType === "all"
+                ? "bg-primary text-white shadow-subtle"
+                : "bg-background text-text-body hover:bg-sky-soft border border-border"
+            }`}
+          >
+            All ({replays.length})
+          </button>
+          <button
+            onClick={() => setFilterType("branched")}
+            className={`px-3 py-1.5 rounded-lg font-heading font-semibold transition-all ${
+              filterType === "branched"
+                ? "bg-primary text-white shadow-subtle"
+                : "bg-background text-text-body hover:bg-sky-soft border border-border"
+            }`}
+          >
+            Branched
+          </button>
+          <button
+            onClick={() => setFilterType("multi")}
+            className={`px-3 py-1.5 rounded-lg font-heading font-semibold transition-all ${
+              filterType === "multi"
+                ? "bg-primary text-white shadow-subtle"
+                : "bg-background text-text-body hover:bg-sky-soft border border-border"
+            }`}
+          >
+            3+ Paths
+          </button>
+        </div>
       </div>
 
       {/* Loading State */}
@@ -89,7 +169,7 @@ export function DashboardView() {
           {/* Create New Card (Slot 1) */}
           <Link
             href="/replay/new"
-            className="group rounded-2xl border-2 border-dashed border-primary/30 hover:border-primary bg-sky-soft/30 hover:bg-sky-soft/60 p-6 flex flex-col justify-center items-center text-center transition-all cursor-pointer min-h-[260px]"
+            className="group rounded-2xl border-2 border-dashed border-primary/30 hover:border-primary bg-sky-soft/20 hover:bg-sky-soft/50 p-6 flex flex-col justify-center items-center text-center transition-all cursor-pointer min-h-[260px]"
           >
             <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center shadow-subtle group-hover:scale-110 transition-transform mb-3">
               <Plus className="w-6 h-6" />
@@ -103,7 +183,7 @@ export function DashboardView() {
           </Link>
 
           {/* Replay Cards */}
-          {replays.map((replay) => {
+          {filteredReplays.map((replay) => {
             const rootScenarios = replay.scenarios.filter((s) => !s.parentScenarioId);
 
             return (
@@ -134,6 +214,17 @@ export function DashboardView() {
                       {replay.decision}
                     </p>
                   </div>
+
+                  {/* User Profile Context tag if present */}
+                  {replay.userProfile && (
+                    <div className="flex items-center gap-2 text-[11px] text-text-muted">
+                      <Briefcase className="w-3 h-3 text-primary" />
+                      <span>{replay.userProfile.occupation || replay.userProfile.industry}</span>
+                      {replay.userProfile.experienceLevel && (
+                        <span>· {replay.userProfile.experienceLevel}</span>
+                      )}
+                    </div>
+                  )}
 
                   {/* Scenarios Badges */}
                   <div className="space-y-1.5 pt-1">
@@ -180,6 +271,28 @@ export function DashboardView() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Empty State when search has 0 results */}
+      {!isLoading && filteredReplays.length === 0 && replays.length > 0 && (
+        <div className="text-center py-12 bg-surface rounded-2xl border border-dashed border-border p-8 space-y-3">
+          <AlertCircle className="w-8 h-8 text-text-muted mx-auto" />
+          <h3 className="font-heading font-semibold text-base text-text-main">
+            No matching decisions found
+          </h3>
+          <p className="text-xs text-text-muted">
+            Try adjusting your search query or clear the filter to view all decisions.
+          </p>
+          <button
+            onClick={() => {
+              setSearchQuery("");
+              setFilterType("all");
+            }}
+            className="text-xs font-semibold text-primary hover:underline"
+          >
+            Reset Filters
+          </button>
         </div>
       )}
     </div>
