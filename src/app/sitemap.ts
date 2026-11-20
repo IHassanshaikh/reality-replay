@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://realityreplay.app";
+  const baseUrl = "https://realityreplay-ai.vercel.app";
   return [
     {
       url: baseUrl,

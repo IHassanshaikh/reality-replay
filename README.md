@@ -16,7 +16,7 @@ An AI-powered decision exploration platform that transforms one major life or ca
 [![React Flow](https://img.shields.io/badge/@xyflow/react-v12-FF0072?style=for-the-badge)](https://reactflow.dev/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge)](LICENSE)
 
-[**Live Demo**](https://realityreplay.app) · [**Watch Showcase**](#-visual-showcase) · [**Explore Architecture**](#-architecture--system-design) · [**Getting Started**](#-getting-started)
+[**Live Demo**](https://realityreplay-ai.vercel.app/) · [**Watch Showcase**](#-visual-showcase) · [**Explore Architecture**](#-architecture--system-design) · [**Getting Started**](#-getting-started)
 
 </div>
 

@@ -10,7 +10,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://realityreplay.app"),
+  metadataBase: new URL("https://realityreplay-ai.vercel.app"),
   title: {
     default: "Reality Replay — Explore What Could Happen | AI Decision Simulator",
     template: "%s | Reality Replay",
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://realityreplay.app",
+    url: "https://realityreplay-ai.vercel.app",
     siteName: "Reality Replay",
     title: "Reality Replay — Explore Alternative Futures",
     description:
