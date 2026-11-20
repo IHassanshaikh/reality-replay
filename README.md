@@ -78,6 +78,8 @@ Standard AI chatbots treat personal decisions like factual trivia queries: they 
 </p>
 
 ---
+## 🌐 Live URL
+https://realityreplay-ai.vercel.app/
 
 ## 🚀 Key Features
 
