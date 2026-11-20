@@ -1,25 +1,6 @@
 import type { Metadata } from "next";
-import { Manrope, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import "@xyflow/react/dist/style.css";
-
-const manrope = Manrope({
-  subsets: ["latin"],
-  variable: "--font-manrope",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Reality Replay — Explore Alternative Futures",
@@ -33,10 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${manrope.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
-    >
+    <html lang="en" className="antialiased">
       <body className="min-h-screen bg-background text-text-main flex flex-col font-sans selection:bg-sky selection:text-primary">
         {children}
       </body>
