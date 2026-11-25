@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { DEFAULT_PRIORITIES } from "@/lib/constants/default-priorities";
+import { saveClientReplay } from "@/lib/storage/client-replays";
 import {
   Sparkles,
   ArrowRight,
@@ -204,6 +205,7 @@ export function DecisionWizard() {
         throw new Error(data.error || "Failed to generate replay");
       }
 
+      saveClientReplay(data.replay);
       router.push(`/replay/${data.replay.id}`);
     } catch (err: any) {
       setError(err.message || "An error occurred while generating scenarios.");

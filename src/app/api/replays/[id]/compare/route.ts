@@ -26,3 +26,33 @@ export async function GET(
     );
   }
 }
+
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+    let replay = await ReplayRepository.getById(id);
+
+    if (!replay && body?.replay && body.replay.id === id) {
+      replay = await ReplayRepository.save(body.replay);
+    }
+
+    if (!replay) {
+      return NextResponse.json(
+        { success: false, error: "Replay not found" },
+        { status: 404 }
+      );
+    }
+
+    const comparison = await generateComparison(replay);
+    return NextResponse.json({ success: true, comparison, replay });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message || "Failed to compare scenarios" },
+      { status: 500 }
+    );
+  }
+}

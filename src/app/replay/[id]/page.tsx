@@ -1,8 +1,9 @@
-import { notFound } from "next/navigation";
 import { Navbar } from "@/components/shared/Navbar";
-import { TimelineCanvas } from "@/components/replay-canvas/TimelineCanvas";
+import { ReplayClientLoader } from "@/components/replay-canvas/ReplayClientLoader";
 import { ReplayRepository } from "@/services/database/replay-repository";
 import { SHOWCASE_REPLAY } from "@/services/ai/showcase-data";
+
+export const dynamic = "force-dynamic";
 
 export default async function ReplayPage({
   params,
@@ -12,19 +13,15 @@ export default async function ReplayPage({
   const { id } = await params;
   let replay = await ReplayRepository.getById(id);
 
-  if (!replay) {
-    if (id === "replay_showcase_career_choice" || id === "demo") {
-      replay = SHOWCASE_REPLAY;
-    } else {
-      notFound();
-    }
+  if (!replay && (id === "replay_showcase_career_choice" || id === "demo")) {
+    replay = SHOWCASE_REPLAY;
   }
 
   return (
     <>
       <Navbar />
       <main className="flex-1 w-full overflow-hidden">
-        <TimelineCanvas initialReplay={replay} />
+        <ReplayClientLoader replayId={id} initialReplay={replay} />
       </main>
     </>
   );

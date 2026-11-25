@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { DecisionReplay, ScenarioComparison } from "@/types";
+import { getClientReplayById } from "@/lib/storage/client-replays";
 import { COLOR_THEME_MAP } from "@/lib/constants/design-tokens";
 import { UncertaintyBadge } from "@/components/shared/UncertaintyBadge";
 import {
@@ -29,7 +30,17 @@ export function CompareFuturesView({ replayId }: CompareFuturesViewProps) {
   useEffect(() => {
     async function loadData() {
       try {
-        const res = await fetch(`/api/replays/${replayId}/compare`);
+        let res = await fetch(`/api/replays/${replayId}/compare`);
+        if (res.status === 404) {
+          const localReplay = getClientReplayById(replayId);
+          if (localReplay) {
+            res = await fetch(`/api/replays/${replayId}/compare`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ replay: localReplay }),
+            });
+          }
+        }
         const data = await res.json();
         if (!res.ok || !data.success) {
           throw new Error(data.error || "Failed to load comparison");

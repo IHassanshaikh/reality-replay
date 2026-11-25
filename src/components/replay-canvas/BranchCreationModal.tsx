@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { MilestoneEvent, ScenarioPath } from "@/types";
+import { DecisionReplay, MilestoneEvent, ScenarioPath } from "@/types";
 import { GitBranch, X, Sparkles, Loader2, Compass } from "lucide-react";
 
 interface BranchCreationModalProps {
@@ -10,6 +10,7 @@ interface BranchCreationModalProps {
   event: MilestoneEvent;
   scenario: ScenarioPath;
   replayId: string;
+  replay?: DecisionReplay;
   onBranchCreated: (newScenarios: ScenarioPath[]) => void;
 }
 
@@ -19,6 +20,7 @@ export function BranchCreationModal({
   event,
   scenario,
   replayId,
+  replay,
   onBranchCreated,
 }: BranchCreationModalProps) {
   const [newDecision, setNewDecision] = useState(
@@ -52,6 +54,7 @@ export function BranchCreationModal({
           parentEventId: event.id,
           newDecision,
           options: [option1, option2],
+          replay,
         }),
       });
 

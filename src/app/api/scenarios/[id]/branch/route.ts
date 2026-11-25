@@ -19,7 +19,10 @@ export async function POST(
       );
     }
 
-    const replay = await ReplayRepository.getById(parsed.data.replayId);
+    let replay = await ReplayRepository.getById(parsed.data.replayId);
+    if (!replay && parsed.data.replay && parsed.data.replay.id === parsed.data.replayId) {
+      replay = await ReplayRepository.save(parsed.data.replay);
+    }
     if (!replay) {
       return NextResponse.json(
         { success: false, error: "Replay not found" },

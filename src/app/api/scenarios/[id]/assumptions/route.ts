@@ -8,7 +8,7 @@ export async function PATCH(
 ) {
   try {
     const { id: scenarioId } = await params;
-    const { replayId, assumptions } = await request.json();
+    const { replayId, assumptions, replay: clientReplay } = await request.json();
 
     if (!replayId || !assumptions || !Array.isArray(assumptions)) {
       return NextResponse.json(
@@ -17,11 +17,20 @@ export async function PATCH(
       );
     }
 
-    const updated = await ReplayRepository.updateAssumptions(
+    let updated = await ReplayRepository.updateAssumptions(
       replayId,
       scenarioId,
       assumptions as ScenarioAssumption[]
     );
+
+    if (!updated && clientReplay && clientReplay.id === replayId) {
+      await ReplayRepository.save(clientReplay);
+      updated = await ReplayRepository.updateAssumptions(
+        replayId,
+        scenarioId,
+        assumptions as ScenarioAssumption[]
+      );
+    }
 
     if (!updated) {
       return NextResponse.json(

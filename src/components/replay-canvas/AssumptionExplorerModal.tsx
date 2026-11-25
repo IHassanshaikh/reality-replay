@@ -112,6 +112,7 @@ export function AssumptionExplorerModal({
         body: JSON.stringify({
           replayId: replay.id,
           assumptions: currentAssumptions,
+          replay,
         }),
       });
 

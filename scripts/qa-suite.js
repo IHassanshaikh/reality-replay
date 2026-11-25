@@ -263,9 +263,12 @@ async function runBrowserQA() {
       assert(r.status === 200, `Internal link ${link} returns 200 (got ${r.status})`);
     }
 
-    // Check 404 route
-    const notFoundRes = await fetch(`${BASE_URL}/replay/nonexistent_id_xyz`);
-    assert(notFoundRes.status === 404, `Nonexistent replay route returns 404 (got ${notFoundRes.status})`);
+    // Check 404 route (API returns 404; browser page renders client 404 state after checking localStorage)
+    const notFoundApiRes = await fetch(`${BASE_URL}/api/replays/nonexistent_id_xyz`);
+    assert(notFoundApiRes.status === 404, `Nonexistent replay API route returns 404 (got ${notFoundApiRes.status})`);
+    await page.goto(`${BASE_URL}/replay/nonexistent_id_xyz`, { waitUntil: "networkidle0" });
+    const has404Text = await page.evaluate(() => document.body.innerText.includes("This timeline does not exist"));
+    assert(has404Text, "Nonexistent replay page renders 'This timeline does not exist' 404 UI");
 
     // Check robots.txt and sitemap.xml
     const robotsRes = await fetch(`${BASE_URL}/robots.txt`);

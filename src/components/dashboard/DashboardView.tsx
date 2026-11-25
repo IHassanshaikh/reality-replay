@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { DecisionReplay } from "@/types";
+import { getClientReplays, deleteClientReplay } from "@/lib/storage/client-replays";
 import { formatDate } from "@/lib/utils";
 import {
   GitBranch,
@@ -28,14 +29,29 @@ export function DashboardView() {
 
   useEffect(() => {
     async function fetchReplays() {
+      const localList = getClientReplays();
       try {
         const res = await fetch("/api/replays");
         const data = await res.json();
-        if (data.success && data.replays) {
-          setReplays(data.replays);
+        const serverList: DecisionReplay[] = data.success && data.replays ? data.replays : [];
+
+        // Merge server and client replays, preferring newer updatedAt
+        const merged = new Map<string, DecisionReplay>();
+        for (const r of serverList) merged.set(r.id, r);
+        for (const r of localList) {
+          const existing = merged.get(r.id);
+          if (!existing || new Date(r.updatedAt) >= new Date(existing.updatedAt)) {
+            merged.set(r.id, r);
+          }
         }
+
+        const sorted = Array.from(merged.values()).sort(
+          (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
+        setReplays(sorted);
       } catch (err) {
         console.error("Failed to fetch dashboard replays:", err);
+        setReplays(localList);
       } finally {
         setIsLoading(false);
       }
@@ -48,13 +64,13 @@ export function DashboardView() {
     e.stopPropagation();
     if (!confirm("Are you sure you want to delete this decision exploration?")) return;
 
+    deleteClientReplay(id);
+    setReplays((prev) => prev.filter((r) => r.id !== id));
+
     try {
-      const res = await fetch(`/api/replays/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setReplays((prev) => prev.filter((r) => r.id !== id));
-      }
+      await fetch(`/api/replays/${id}`, { method: "DELETE" });
     } catch (err) {
-      console.error("Failed to delete replay:", err);
+      console.error("Failed to delete replay from server:", err);
     }
   };
 

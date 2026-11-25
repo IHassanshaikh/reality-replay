@@ -19,6 +19,7 @@ import { TimelineMilestoneNode } from "./nodes/TimelineMilestoneNode";
 import { ScenarioDrawer } from "./ScenarioDrawer";
 import { BranchCreationModal } from "./BranchCreationModal";
 import { AssumptionExplorerModal } from "./AssumptionExplorerModal";
+import { saveClientReplay } from "@/lib/storage/client-replays";
 import { COLOR_THEME_MAP } from "@/lib/constants/design-tokens";
 import { GitBranch, Sparkles, SlidersHorizontal, CheckCircle2, ChevronRight } from "lucide-react";
 import Link from "next/link";
@@ -89,12 +90,16 @@ export function TimelineCanvas({ initialReplay }: TimelineCanvasProps) {
   };
 
   const handleBranchCreated = (childScenarios: ScenarioPath[]) => {
-    setReplay((prev) => ({
-      ...prev,
-      scenarios: [...prev.scenarios, ...childScenarios],
-      branchesExploredCount: prev.branchesExploredCount + childScenarios.length,
-      updatedAt: new Date().toISOString(),
-    }));
+    setReplay((prev) => {
+      const updated: DecisionReplay = {
+        ...prev,
+        scenarios: [...prev.scenarios, ...childScenarios],
+        branchesExploredCount: prev.branchesExploredCount + childScenarios.length,
+        updatedAt: new Date().toISOString(),
+      };
+      saveClientReplay(updated);
+      return updated;
+    });
   };
 
   const handleOpenAssumptionExplorer = (scenarioId?: string) => {
@@ -103,13 +108,17 @@ export function TimelineCanvas({ initialReplay }: TimelineCanvasProps) {
   };
 
   const handleUpdateScenarioAssumptions = (scenarioId: string, updatedAssumptions: ScenarioAssumption[]) => {
-    setReplay((prev) => ({
-      ...prev,
-      scenarios: prev.scenarios.map((s) =>
-        s.id === scenarioId ? { ...s, assumptions: updatedAssumptions } : s
-      ),
-      updatedAt: new Date().toISOString(),
-    }));
+    setReplay((prev) => {
+      const updated: DecisionReplay = {
+        ...prev,
+        scenarios: prev.scenarios.map((s) =>
+          s.id === scenarioId ? { ...s, assumptions: updatedAssumptions } : s
+        ),
+        updatedAt: new Date().toISOString(),
+      };
+      saveClientReplay(updated);
+      return updated;
+    });
 
     if (selectedScenario && selectedScenario.id === scenarioId) {
       setSelectedScenario((prev) =>
@@ -238,7 +247,10 @@ export function TimelineCanvas({ initialReplay }: TimelineCanvasProps) {
         onClose={() => setIsAssumptionModalOpen(false)}
         replay={replay}
         activeScenarioId={assumptionModalScenarioId}
-        onUpdateReplay={(updated) => setReplay(updated)}
+        onUpdateReplay={(updated) => {
+          saveClientReplay(updated);
+          setReplay(updated);
+        }}
       />
 
       {/* Branch Creation Modal */}
@@ -251,6 +263,7 @@ export function TimelineCanvas({ initialReplay }: TimelineCanvasProps) {
           event={branchModalState.event}
           scenario={branchModalState.scenario}
           replayId={replay.id}
+          replay={replay}
           onBranchCreated={handleBranchCreated}
         />
       )}

@@ -150,6 +150,7 @@ export const BranchGenerationRequestSchema = z.object({
   parentEventId: z.string(),
   newDecision: z.string().min(5),
   options: z.array(z.string()).min(2).max(3),
+  replay: z.any().optional(),
 });
 
 export const BranchGenerationResponseSchema = z.object({
