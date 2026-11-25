@@ -26,7 +26,13 @@ export async function generateBranchScenarios(params: {
   const rawAI = await callGeminiStructured<any>(prompt);
   if (rawAI) {
     try {
-      const parsed = BranchGenerationResponseSchema.safeParse(rawAI);
+      const normalizedBranchAI = Array.isArray(rawAI)
+        ? { childScenarios: rawAI }
+        : {
+            ...rawAI,
+            childScenarios: rawAI.childScenarios || rawAI.scenarios || rawAI.branches || rawAI.paths || [],
+          };
+      const parsed = BranchGenerationResponseSchema.safeParse(normalizedBranchAI);
       if (parsed.success && parsed.data.childScenarios.length > 0) {
         return parsed.data.childScenarios.map((cs, idx) => ({
           ...cs,

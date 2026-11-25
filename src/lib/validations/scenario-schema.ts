@@ -1,5 +1,34 @@
 import { z } from "zod";
 
+function normalizeHorizon(val: unknown): "3_months" | "1_year" | "3_years" {
+  const s = String(val || "").toLowerCase();
+  if (s.includes("3_m") || s.includes("3 m") || s.includes("month 3") || s.includes("three month")) return "3_months";
+  if (s.includes("3_y") || s.includes("3 y") || s.includes("year 3") || s.includes("three year")) return "3_years";
+  return "1_year";
+}
+
+function normalizeUncertainty(val: unknown): "lower" | "moderate" | "higher" {
+  const s = String(val || "").toLowerCase();
+  if (s.includes("low")) return "lower";
+  if (s.includes("high")) return "higher";
+  return "moderate";
+}
+
+function normalizeColorTheme(val: unknown): "blue" | "teal" | "lavender" | "neutral" {
+  const s = String(val || "").toLowerCase();
+  if (s.includes("teal") || s.includes("green") || s.includes("emerald")) return "teal";
+  if (s.includes("lavender") || s.includes("purple") || s.includes("violet")) return "lavender";
+  if (s.includes("neutral") || s.includes("slate") || s.includes("gray")) return "neutral";
+  return "blue";
+}
+
+function normalizeAssumptionStatus(val: unknown): "likely" | "uncertain" | "unlikely" {
+  const s = String(val || "").toLowerCase();
+  if (s.includes("unlikely")) return "unlikely";
+  if (s.includes("likely")) return "likely";
+  return "uncertain";
+}
+
 export const MilestoneEventSchema = z.preprocess(
   (val: any) => {
     if (typeof val !== "object" || val === null) return val;
@@ -7,11 +36,12 @@ export const MilestoneEventSchema = z.preprocess(
       ...val,
       title: val.title || val.eventTitle || val.name || "Milestone Development",
       description: val.description || val.summary || "Hypothetical event details.",
-      horizon: val.horizon || (val.timeHorizon === "3_months" ? "3_months" : val.timeHorizon === "3_years" ? "3_years" : "1_year"),
-      opportunities: val.opportunities || val.benefits || val.pros || [],
-      challenges: val.challenges || val.risks || val.obstacles || val.cons || [],
-      assumptions: val.assumptions || [],
-      turningPoints: val.turningPoints || val.turning_points || [],
+      horizon: normalizeHorizon(val.horizon || val.timeHorizon || val.horizonLabel),
+      uncertaintyLevel: normalizeUncertainty(val.uncertaintyLevel || val.uncertainty),
+      opportunities: Array.isArray(val.opportunities || val.benefits || val.pros) ? (val.opportunities || val.benefits || val.pros) : [],
+      challenges: Array.isArray(val.challenges || val.risks || val.obstacles || val.cons) ? (val.challenges || val.risks || val.obstacles || val.cons) : [],
+      assumptions: Array.isArray(val.assumptions) ? val.assumptions : [],
+      turningPoints: Array.isArray(val.turningPoints || val.turning_points) ? (val.turningPoints || val.turning_points) : [],
     };
   },
   z.object({
@@ -43,6 +73,13 @@ export const ScenarioAssumptionSchema = z.preprocess(
     if (typeof val === "string") {
       return { statement: val, status: "uncertain" };
     }
+    if (typeof val === "object" && val !== null) {
+      return {
+        ...val,
+        statement: val.statement || val.assumption || val.text || "Key scenario assumption",
+        status: normalizeAssumptionStatus(val.status),
+      };
+    }
     return val;
   },
   z.object({
@@ -55,13 +92,28 @@ export const ScenarioAssumptionSchema = z.preprocess(
 export const ScenarioPathSchema = z.preprocess(
   (val: any) => {
     if (typeof val !== "object" || val === null) return val;
+    const rawUncertainty = val.overallUncertainty;
+    const normalizedUncertainty =
+      typeof rawUncertainty === "string"
+        ? { level: normalizeUncertainty(rawUncertainty), reason: "Outcome depends on external variables." }
+        : typeof rawUncertainty === "object" && rawUncertainty !== null
+        ? {
+            level: normalizeUncertainty(rawUncertainty.level),
+            reason: rawUncertainty.reason || "Outcome depends on multiple external variables.",
+          }
+        : undefined;
+
     return {
       ...val,
       pathTitle: val.pathTitle || val.title || val.scenarioTitle || val.name || "Hypothetical Path",
       overview: val.overview || val.summary || val.description || "Alternative trajectory overview.",
-      timeline: val.timeline || val.events || val.milestones || [],
-      assumptions: val.assumptions || [],
-      suggestedFollowupQuestions: val.suggestedFollowupQuestions || val.nextDecisions || val.questions || [],
+      colorTheme: normalizeColorTheme(val.colorTheme || val.theme || val.color),
+      overallUncertainty: normalizedUncertainty,
+      timeline: Array.isArray(val.timeline || val.events || val.milestones) ? (val.timeline || val.events || val.milestones) : [],
+      assumptions: Array.isArray(val.assumptions) ? val.assumptions : [],
+      suggestedFollowupQuestions: Array.isArray(val.suggestedFollowupQuestions || val.nextDecisions || val.questions)
+        ? (val.suggestedFollowupQuestions || val.nextDecisions || val.questions)
+        : [],
     };
   },
   z.object({

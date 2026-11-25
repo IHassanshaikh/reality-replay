@@ -107,7 +107,65 @@ Each scenario must project 3 milestone events tailored specifically to the user'
 
 Also include 3 key assumptions for each path with status ("likely", "uncertain", or "unlikely"), and 2 provocative follow-up questions that could trigger branching.
 
-Ensure your JSON strictly adheres to the schema.
+Return strictly valid JSON matching this exact structure:
+{
+  "decisionTitle": "Concise title for the overall dilemma",
+  "scenarios": [
+    {
+      "optionLabel": "Option A",
+      "optionDescription": "Full description of option",
+      "pathTitle": "Memorable 3-5 word thematic title (e.g., The Corporate Ascent)",
+      "overview": "2-sentence overview of this trajectory",
+      "colorTheme": "blue",
+      "overallUncertainty": {
+        "level": "moderate",
+        "reason": "Specific factual reason for this uncertainty level"
+      },
+      "assumptions": [
+        {
+          "id": "asm_1",
+          "statement": "Specific premise that must hold true for this path to succeed",
+          "status": "likely"
+        },
+        {
+          "id": "asm_2",
+          "statement": "Second key assumption",
+          "status": "uncertain"
+        },
+        {
+          "id": "asm_3",
+          "statement": "Third key assumption",
+          "status": "unlikely"
+        }
+      ],
+      "suggestedFollowupQuestions": [
+        "Provocative what-if question 1?",
+        "Provocative what-if question 2?"
+      ],
+      "timeline": [
+        {
+          "id": "evt_1",
+          "horizon": "3_months",
+          "horizonLabel": "Month 3 · Early Phase",
+          "title": "Specific milestone title",
+          "description": "Detailed narrative of what happens at Month 3",
+          "opportunities": ["Opportunity 1", "Opportunity 2"],
+          "challenges": ["Challenge 1", "Challenge 2"],
+          "assumptions": ["Milestone-specific assumption"],
+          "uncertaintyLevel": "lower",
+          "uncertaintyReason": "Why this milestone has this uncertainty",
+          "turningPoints": [
+            {
+              "title": "Unexpected Catalyst",
+              "description": "What unexpected event occurs",
+              "possibleImpact": "How it changes the trajectory"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
 `;
 }
 

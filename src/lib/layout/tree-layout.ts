@@ -46,20 +46,22 @@ export function buildReplayGraph(
     const theme = COLOR_THEME_MAP[scenario.colorTheme] || COLOR_THEME_MAP.blue;
 
     // Connect Root to first milestone of each scenario
-    const firstEvent = scenario.timeline[0];
-    const firstEventNodeId = `node_${scenario.id}_${firstEvent.id}`;
+    const firstEvent = scenario.timeline?.[0];
+    if (firstEvent) {
+      const firstEventNodeId = `node_${scenario.id}_${firstEvent.id}`;
 
-    edges.push({
-      id: `edge_root_to_${scenario.id}`,
-      source: "node_root",
-      target: firstEventNodeId,
-      type: "smoothstep",
-      animated: true,
-      style: {
-        stroke: theme.edgeColor,
-        strokeWidth: 2.5,
-      },
-    });
+      edges.push({
+        id: `edge_root_to_${scenario.id}`,
+        source: "node_root",
+        target: firstEventNodeId,
+        type: "smoothstep",
+        animated: true,
+        style: {
+          stroke: theme.edgeColor,
+          strokeWidth: 2.5,
+        },
+      });
+    }
 
     // Milestone Event Nodes: Month 3, Year 1, Year 3
     const milestoneSpacingX = 340;
