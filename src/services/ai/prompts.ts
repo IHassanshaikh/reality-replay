@@ -21,6 +21,14 @@ ACCURACY & PERSONALIZATION RULES:
 9. Explore consequences at 3 distinct time horizons: "3_months" (Early adjustments), "1_year" (Compounding shifts), "3_years" (Structural outcomes).
 10. Assign a colorTheme to each option: Path A -> "blue", Path B -> "teal", Path C -> "lavender", and subsequent -> "neutral".
 
+BRUTAL HONESTY & ANTI-OPTIMISM BIAS RULES (CRITICAL):
+1. NEVER sugarcoat outcomes or force a happy ending. Resist default AI positivity.
+2. Be real, candid, and unvarnished—even bitter or blunt—whenever the user's plan has serious flaws, weak assumptions, or structural mismatches.
+3. If the user's Financial Runway, Experience Level, or Constraints make an option unsustainable or naive, DO NOT magically rescue it. Show the actual failure mode: cash depletion, zero traction, burnout, layoff, toxic politics, relationship strain, forced retreat, or bitter regret.
+4. Not every path should end in success at Year 3. Some paths plateau into golden handcuffs and quiet resentment; some crash within 12 months; some succeed financially at the cost of health or personal life.
+5. Expose blind spots directly in the milestone descriptions and challenges. Mark fragile or wishful premises honestly as "unlikely" in the assumptions list.
+6. Keep it grounded and realistic—not cartoonishly bleak, just ruthlessly honest about real-world odds, friction, and human psychology.
+
 UNCERTAINTY RULES:
 1. Never fabricate statistical probabilities (e.g. "78% chance of success").
 2. Categorize uncertainty as "lower", "moderate", or "higher" with an explicit factual reason.
@@ -100,10 +108,11 @@ ${input.priorities.map((p, idx) => `${idx + 1}. ${p}`).join("\n")}
 
 INSTRUCTIONS:
 Generate a scenario path for EACH of the ${input.options.length} options.
+Be brutally honest and realistic—DO NOT make every path succeed or end happily. If an option clashes with their financial runway, experience level, or constraints, explicitly show the harsh consequences (runway burn, stalled traction, burnout, forced retreat, golden handcuffs, or bitter regret). Call out flawed premises bluntly in challenges and mark unrealistic assumptions as "unlikely".
 Each scenario must project 3 milestone events tailored specifically to the user's bio, interests, and worst-case fear:
-- 3_months: Short term early friction or momentum
-- 1_year: Consolidation, compounding effects, or operational shifts
-- 3_years: Structural outcomes, personal satisfaction, and lasting trade-offs
+- 3_months: Short term early friction, reality checks, or initial momentum
+- 1_year: Compounding consequences, operational strain, or painful crossroads
+- 3_years: Structural outcomes, lasting trade-offs, regret, or earned stability
 
 Also include 3 key assumptions for each path with status ("likely", "uncertain", or "unlikely"), and 2 provocative follow-up questions that could trigger branching.
 
@@ -267,10 +276,11 @@ USER'S CHOSEN PRIORITIES:
 ${input.priorities.join(", ")}
 
 INSTRUCTIONS:
-1. Provide qualitative assessments across dimensions like Financial Stability, Learning Velocity, Personal Autonomy, Stress/Risk, and Career Compounding.
-2. DO NOT declare one future objectively superior or calculate fake percentages.
-3. Explain which path best aligns with each of the user's specific priorities and why.
-4. Highlight the 3 biggest differences between these futures and the critical unknowns.
+1. Provide candid, unvarnished qualitative assessments across dimensions like Financial Stability, Learning Velocity, Personal Autonomy, Stress/Risk, and Career Compounding.
+2. Be brutally honest—if a path carries high burnout, financial ruin, or stagnation risk, state it plainly without softening the blow.
+3. DO NOT declare one future objectively superior or calculate fake percentages.
+4. Explain which path best aligns with each of the user's specific priorities and what painful sacrifice it demands in return.
+5. Highlight the 3 biggest differences between these futures and the critical unknowns.
 Return valid JSON matching this exact structure:
 {
   "dimensions": [
